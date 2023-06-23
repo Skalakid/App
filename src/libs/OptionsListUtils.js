@@ -609,7 +609,7 @@ function getOptions(
     // This is a temporary fix for all the logic that's been breaking because of the new privacy changes
     // See https://github.com/Expensify/Expensify/issues/293465 for more context
     // eslint-disable-next-line no-param-reassign
-    personalDetails = _.pick(personalDetails, (detail) => Boolean(detail.login));
+    personalDetails = _.pick(personalDetails, (detail) => Boolean(detail.accountID));
 
     let recentReportOptions = [];
     let personalDetailsOptions = [];
@@ -691,10 +691,10 @@ function getOptions(
     }
 
     // Always exclude already selected options and the currently logged in user
-    const loginOptionsToExclude = [...selectedOptions, {login: currentUserLogin}];
+    const loginOptionsToExclude = [...selectedOptions, {accountID: currentUserAccountID}];
 
-    _.each(excludeLogins, (login) => {
-        loginOptionsToExclude.push({login});
+    _.each(excludeLogins, (accountID) => {
+        loginOptionsToExclude.push({accountID});
     });
 
     if (includeRecentReports) {
@@ -707,15 +707,16 @@ function getOptions(
             }
 
             const isCurrentUserOwnedPolicyExpenseChatThatCouldShow =
-                reportOption.isPolicyExpenseChat && reportOption.ownerEmail === currentUserLogin && includeOwnedWorkspaceChats && !reportOption.isArchivedRoom;
+                reportOption.isPolicyExpenseChat && reportOption.ownerAccountID === currentUserAccountID && includeOwnedWorkspaceChats && !reportOption.isArchivedRoom;
 
             // Skip if we aren't including multiple participant reports and this report has multiple participants
-            if (!isCurrentUserOwnedPolicyExpenseChatThatCouldShow && !includeMultipleParticipantReports && !reportOption.login) {
+            if (!isCurrentUserOwnedPolicyExpenseChatThatCouldShow && !includeMultipleParticipantReports && !reportOption.login && !reportOption.accountID) {
                 continue;
             }
 
             // If we're excluding threads, check the report to see if it has a single participant and if the participant is already selected
-            if (!includeThreads && reportOption.login && _.some(loginOptionsToExclude, (option) => option.login === reportOption.login)) {
+            if (!includeThreads && reportOption.accountID && _.some(loginOptionsToExclude, (loginToExclude) => loginToExclude.accountID === reportOption.accountID)) {
+                console.log('XXXX');
                 continue;
             }
 
@@ -729,8 +730,8 @@ function getOptions(
             recentReportOptions.push(reportOption);
 
             // Add this login to the exclude list so it won't appear when we process the personal details
-            if (reportOption.login) {
-                loginOptionsToExclude.push({login: reportOption.login});
+            if (reportOption.accountID) {
+                loginOptionsToExclude.push({accountID: reportOption.accountID});
             }
         }
     }
@@ -738,7 +739,7 @@ function getOptions(
     if (includePersonalDetails) {
         // Next loop over all personal details removing any that are selectedUsers or recentChats
         _.each(allPersonalDetailsOptions, (personalDetailOption) => {
-            if (_.some(loginOptionsToExclude, (loginOptionToExclude) => loginOptionToExclude.login === personalDetailOption.login)) {
+            if (_.some(loginOptionsToExclude, (loginOptionToExclude) => loginOptionToExclude.accountID === personalDetailOption.accountID)) {
                 return;
             }
             const {searchText, participantsList, isChatRoom} = personalDetailOption;
@@ -750,7 +751,7 @@ function getOptions(
         });
     }
 
-    let currentUserOption = _.find(allPersonalDetailsOptions, (personalDetailsOption) => personalDetailsOption.login === currentUserLogin);
+    let currentUserOption = _.find(allPersonalDetailsOptions, (personalDetailsOption) => personalDetailsOption.accountID === currentUserAccountID);
     if (searchValue && !isSearchStringMatch(searchValue, currentUserOption.searchText)) {
         currentUserOption = null;
     }
