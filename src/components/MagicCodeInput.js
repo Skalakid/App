@@ -221,8 +221,12 @@ function MagicCodeInput(props) {
         numbers = [...numbers.slice(0, editIndex), ...numbersArr, ...numbers.slice(numbersArr.length + editIndex, props.maxLength)];
 
         setFocusedIndex(updatedFocusedIndex);
+        setEditIndex(updatedFocusedIndex);
         setInput(value);
 
+        if (!_.isUndefined(updatedFocusedIndex)) {
+            inputRefs.current[updatedFocusedIndex].focus();
+        }
         const finalInput = composeToString(numbers);
         props.onChangeText(finalInput);
     };
@@ -343,7 +347,8 @@ function MagicCodeInput(props) {
                                 }}
                                 onKeyPress={onKeyPress}
                                 onPress={(event) => onPress(event, index)}
-                                onFocus={onFocus}
+                                onFocus={(event) => onPress(event, index)}
+                                onBlur={() => setFocusedIndex(undefined)}
                                 caretHidden={isMobileSafari}
                                 inputStyle={[isMobileSafari ? styles.magicCodeInputTransparent : undefined]}
                             />
