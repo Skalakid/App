@@ -17,6 +17,7 @@ import variables from '../styles/variables';
 import addEncryptedAuthTokenToURL from '../libs/addEncryptedAuthTokenToURL';
 import PressableWithoutFeedback from './Pressable/PressableWithoutFeedback';
 import CONST from '../CONST';
+import VideoPlayer from './VideoPlayer';
 
 const propTypes = {
     /** Whether source url requires authentication */
@@ -52,6 +53,9 @@ const propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     containerStyles: PropTypes.arrayOf(PropTypes.object),
 
+    // eslint-disable-next-line react/forbid-prop-types
+    videoPlayerStyles: PropTypes.arrayOf(PropTypes.object),
+
     ...withLocalizePropTypes,
 };
 
@@ -66,6 +70,7 @@ const defaultProps = {
     onScaleChanged: () => {},
     onToggleKeyboard: () => {},
     containerStyles: [],
+    videoPlayerStyles: [],
     isFocused: false,
 };
 
@@ -114,6 +119,24 @@ function AttachmentView(props) {
                 isAuthTokenRequired={isImage && props.isAuthTokenRequired}
             />
         );
+        return props.onPress ? (
+            <PressableWithoutFeedback
+                onPress={props.onPress}
+                disabled={loadComplete}
+                style={containerStyles}
+                accessibilityRole={CONST.ACCESSIBILITY_ROLE.IMAGEBUTTON}
+                accessibilityLabel={props.file.name || props.translate('attachmentView.unknownFilename')}
+            >
+                {children}
+            </PressableWithoutFeedback>
+        ) : (
+            children
+        );
+    }
+
+    const isVideo = Str.isVideo(props.source);
+    if (isVideo || (props.file && Str.isVideo(props.file.name))) {
+        const children = <VideoPlayer url={props.source} videoPlayerStyles={props.videoPlayerStyles}/>;
         return props.onPress ? (
             <PressableWithoutFeedback
                 onPress={props.onPress}
