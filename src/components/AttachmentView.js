@@ -54,7 +54,7 @@ const propTypes = {
     containerStyles: PropTypes.arrayOf(PropTypes.object),
 
     // eslint-disable-next-line react/forbid-prop-types
-    videoPlayerStyles: PropTypes.arrayOf(PropTypes.object),
+    videoPlayerStyles: PropTypes.object,
 
     ...withLocalizePropTypes,
 };
@@ -70,7 +70,7 @@ const defaultProps = {
     onScaleChanged: () => {},
     onToggleKeyboard: () => {},
     containerStyles: [],
-    videoPlayerStyles: [],
+    videoPlayerStyles: {},
     isFocused: false,
 };
 
@@ -136,7 +136,12 @@ function AttachmentView(props) {
 
     const isVideo = Str.isVideo(props.source);
     if (isVideo || (props.file && Str.isVideo(props.file.name))) {
-        const children = <VideoPlayer url={props.source} videoPlayerStyles={props.videoPlayerStyles}/>;
+        const children = (
+            <VideoPlayer
+                url={props.source}
+                videoPlayerStyles={props.videoPlayerStyles}
+            />
+        );
         return props.onPress ? (
             <PressableWithoutFeedback
                 onPress={props.onPress}

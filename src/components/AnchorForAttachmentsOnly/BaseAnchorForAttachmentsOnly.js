@@ -89,17 +89,11 @@ function BaseAnchorForAttachmentsOnly(props) {
                         originalFileName={props.displayName}
                     >
                         {({show}) => (
-                            <PressableWithoutFeedback
-                                accessibilityLabel={fileName}
-                                accessibilityRole="button"
-                                style={props.style}
-                                onPress={thumbnailImageModeEnabled ? show : undefined}
-                            >
-                                <VideoPlayerPreview
-                                    url={sourceURLWithAuth}
-                                    fileName={fileName}
-                                />
-                            </PressableWithoutFeedback>
+                            <VideoPlayerPreview
+                                url={sourceURLWithAuth}
+                                fileName={fileName}
+                                showModal={show}
+                            />
                         )}
                     </AttachmentModal>
                 ) : (

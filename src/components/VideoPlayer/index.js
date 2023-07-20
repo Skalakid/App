@@ -1,27 +1,37 @@
-import {createElement} from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
-// import styles from '../../styles/styles';
+import {Video, ResizeMode} from 'expo-av';
+import styles from '../../styles/styles';
 
 const propTypes = {
-    /** URL to video */
     url: PropTypes.string.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
-    videoPlayerStyles: PropTypes.object,
+    // videoPlayerStyles: PropTypes.object,
 };
 
-const defaultProps = {
-    videoPlayerStyles: [],
-};
+const defaultProps = {};
 
 function VideoPlayer(props) {
-    return createElement('video', {
-        src: props.url,
-        controls: true,
-        style: {height: '100%', width: '100%', ...props.videoPlayerStyles},
-    });
+    const ref = useRef();
+
+    return (
+        <Video
+            ref={ref}
+            style={[styles.w100, styles.h100]}
+            videoStyle={[styles.w100, styles.h100]}
+            source={{
+                uri: props.url,
+            }}
+            useNativeControls
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping={false}
+            shouldPlay
+        />
+    );
 }
 
 VideoPlayer.propTypes = propTypes;
 VideoPlayer.defaultProps = defaultProps;
-VideoPlayer.displayName = 'VideoPlayer';
+VideoPlayer.displayName = 'AttachmentView';
+
 export default VideoPlayer;
