@@ -9,6 +9,7 @@ import withDelayToggleButtonState, {withDelayToggleButtonStatePropTypes} from '.
 import BaseMiniContextMenuItem from './BaseMiniContextMenuItem';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import getContextMenuItemStyles from '../styles/getContextMenuItemStyles';
+import ReportActionComposeFocusManager from '../libs/ReportActionComposeFocusManager';
 
 const propTypes = {
     /** Icon Component */
@@ -59,6 +60,9 @@ function ContextMenuItem({isDelayButtonStateComplete, onPress, successIcon, succ
         // We may want to replace this check by checking the Result from OnPress Callback in future.
         if (successIcon || successText) {
             toggleDelayButtonState();
+            if (isMini) {
+                ReportActionComposeFocusManager.focus();
+            }
         }
     }, [isDelayButtonStateComplete, onPress, successIcon, successText, toggleDelayButtonState]);
 

@@ -3,6 +3,12 @@ import React from 'react';
 
 const composerRef = React.createRef();
 let focusCallback = null;
+let focusMainComposerCallback = null;
+
+function init(callback) {
+    focusCallback = callback;
+    focusMainComposerCallback = callback;
+}
 
 /**
  * Register a callback to be called when focus is requested.
@@ -12,6 +18,18 @@ let focusCallback = null;
  */
 function onComposerFocus(callback) {
     focusCallback = callback;
+}
+
+function onMainComposerFocus(callback) {
+    focusMainComposerCallback = callback;
+}
+
+function focusMainComposer() {
+    if (!_.isFunction(focusMainComposerCallback)) {
+        return;
+    }
+    focusCallback = focusMainComposerCallback;
+    focusMainComposerCallback();
 }
 
 /**
@@ -43,9 +61,12 @@ function isFocused() {
 }
 
 export default {
+    init,
     composerRef,
     onComposerFocus,
+    onMainComposerFocus,
     focus,
+    focusMainComposer,
     clear,
     isFocused,
 };

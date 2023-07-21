@@ -218,6 +218,13 @@ class ReportActionCompose extends React.Component {
         this.unsubscribeNavigationBlur = () => null;
         this.unsubscribeNavigationFocus = () => null;
 
+        this.refocusCallback = () => {
+            if (!this.willBlurTextInputOnTapOutside || !this.props.isFocused) {
+                return;
+            }
+            this.focus(false);
+        };
+
         this.state = {
             isFocused: this.shouldFocusInputOnScreenFocus && !this.props.modal.isVisible && !this.props.modal.willAlertModalBecomeVisible && this.props.shouldShowComposeInput,
             isFullComposerAvailable: props.isComposerFullSize,
@@ -243,13 +250,8 @@ class ReportActionCompose extends React.Component {
     componentDidMount() {
         // This callback is used in the contextMenuActions to manage giving focus back to the compose input.
         // TODO: we should clean up this convoluted code and instead move focus management to something like ReportFooter.js or another higher up component
-        ReportActionComposeFocusManager.onComposerFocus(() => {
-            if (!this.willBlurTextInputOnTapOutside || !this.props.isFocused) {
-                return;
-            }
 
-            this.focus(false);
-        });
+        ReportActionComposeFocusManager.init(this.refocusCallback);
 
         this.unsubscribeNavigationBlur = this.props.navigation.addListener('blur', () => KeyDownListener.removeKeyDownPressListner(this.focusComposerOnKeyPress));
         this.unsubscribeNavigationFocus = this.props.navigation.addListener('focus', () => KeyDownListener.addKeyDownPressListner(this.focusComposerOnKeyPress));
@@ -333,6 +335,9 @@ class ReportActionCompose extends React.Component {
      * @param {Boolean} shouldHighlight
      */
     setIsFocused(shouldHighlight) {
+        if (shouldHighlight) {
+            ReportActionComposeFocusManager.onComposerFocus(this.refocusCallback);
+        }
         this.setState({isFocused: shouldHighlight});
     }
 
