@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Video, ResizeMode} from 'expo-av';
 import styles from '../../styles/styles';
@@ -15,12 +15,15 @@ const defaultProps = {
 };
 
 function VideoPlayer(props) {
+    const [isLoaded, setIsLoaded] = useState(false);
     const ref = useRef();
 
     useEffect(() => {
         if (!ref.current.setStatusAsync) return;
-        ref.current.setStatusAsync({shouldPlay: props.shouldPlay});
-    }, [props.shouldPlay]);
+
+        if (isLoaded && props.shouldPlay) ref.current.setStatusAsync({shouldPlay: true});
+        else ref.current.setStatusAsync({shouldPlay: false});
+    }, [props.shouldPlay, isLoaded]);
 
     return (
         <Video
@@ -34,6 +37,7 @@ function VideoPlayer(props) {
             resizeMode={ResizeMode.CONTAIN}
             isLooping={false}
             shouldPlay
+            onReadyForDisplay={() => setIsLoaded(true)}
         />
     );
 }
