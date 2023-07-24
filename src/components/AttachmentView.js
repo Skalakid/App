@@ -140,6 +140,7 @@ function AttachmentView(props) {
             <VideoPlayer
                 url={props.source}
                 videoPlayerStyles={props.videoPlayerStyles}
+                shouldPlay={props.isFocused}
             />
         );
         return props.onPress ? (

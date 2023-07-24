@@ -141,7 +141,8 @@ function AttachmentModal(props) {
      */
     const downloadAttachment = useCallback(() => {
         let sourceURL = source;
-        if (isAuthTokenRequired) {
+        const isVideo = Boolean(Str.isVideo(sourceURL));
+        if (!isVideo && isAuthTokenRequired) {
             sourceURL = addEncryptedAuthTokenToURL(sourceURL);
         }
 

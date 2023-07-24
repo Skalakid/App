@@ -161,10 +161,11 @@ class AttachmentCarousel extends React.Component {
             onopentag: (name, attribs) => {
                 const isVideo = Boolean(Str.isVideo(attribs['data-expensify-source'] || ''));
                 if (isVideo) {
+                    const splittedUrl = attribs['data-expensify-source'].split('/');
                     attachments.unshift({
                         source: addEncryptedAuthTokenToURL(tryResolveUrlFromApiRoot(attribs['data-expensify-source'])),
                         isAuthTokenRequired: true,
-                        file: {name},
+                        file: {name: splittedUrl[splittedUrl.length - 1]},
                     });
                     return;
                 }
