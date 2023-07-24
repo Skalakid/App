@@ -19,6 +19,7 @@ import UnreadActionIndicator from '../../../components/UnreadActionIndicator';
 import ReportActionItemMessageEdit from './ReportActionItemMessageEdit';
 import ReportActionItemCreated from './ReportActionItemCreated';
 import ReportActionItemThread from './ReportActionItemThread';
+import Str from 'expensify-common/lib/str';
 import LinkPreviewer from './LinkPreviewer';
 import compose from '../../../libs/compose';
 import withWindowDimensions, {windowDimensionsPropTypes} from '../../../components/withWindowDimensions';
@@ -353,7 +354,7 @@ function ReportActionItem(props) {
         return (
             <>
                 {children}
-                {!isHidden && !_.isEmpty(props.action.linkMetadata) && (
+                {!isHidden && !_.isEmpty(props.action.linkMetadata) && !Str.isVideo(props.action.originalMessage.html.split('"')[1]) && (
                     <View style={props.draftMessage ? styles.chatItemReactionsDraftRight : {}}>
                         <LinkPreviewer linkMetadata={_.filter(props.action.linkMetadata, (item) => !_.isEmpty(item))} />
                     </View>
