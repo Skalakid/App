@@ -28,7 +28,7 @@ function VideoPlayerPreview(props) {
             accessibilityLabel={props.fileName}
         />
     ) : (
-        <View style={{height: 250, width: 400, ...styles.webViewStyles.tagStyles.img}}>
+        <View style={{height: 250, width: 400, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
             <AttachmentView
                 source={props.url}
                 file={{name: props.fileName}}

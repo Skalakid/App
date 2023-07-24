@@ -48,41 +48,19 @@ const defaultProps = {
 
 function BaseAnchorForAttachmentsOnly(props) {
     const sourceURL = props.source;
+    console.log(sourceURL);
     const sourceURLWithAuth = addEncryptedAuthTokenToURL(sourceURL);
     const sourceID = (sourceURL.match(CONST.REGEX.ATTACHMENT_ID) || [])[1];
     const fileName = props.displayName;
 
     const isDownloading = props.download && props.download.isDownloading;
-
-    const VideoOrThumbnailImage = ({showModal}) =>
-        thumbnailImageModeEnabled ? (
-            <ThumbnailImage
-                previewSourceURL={placeholderThumbnailImage}
-                style={styles.webViewStyles.tagStyles.img}
-                isAuthTokenRequired
-                imageWidth={videoContainerWidth}
-            />
-        ) : (
-            <View style={{width: videoContainerWidth, ...styles.webViewStyles.tagStyles.img}}>
-                <AttachmentView
-                    source={sourceURLWithAuth}
-                    file={{name: fileName}}
-                />
-                <Pressable
-                    onPress={showModal}
-                    style={{position: 'absolute', top: 10, right: 10}}
-                >
-                    <Icon src={Expensicons.Expand} />
-                </Pressable>
-            </View>
-        );
-
     return (
         <ShowContextMenuContext.Consumer>
             {({anchor, report, action, checkIfContextMenuActive}) =>
                 Str.isVideo(sourceURL) ? (
                     <AttachmentModal
                         allowDownload
+                        report={report}
                         reportID={report.reportID}
                         source={sourceURLWithAuth}
                         isAuthTokenRequired={props.isAuthTokenRequired}

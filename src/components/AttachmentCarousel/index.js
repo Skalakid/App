@@ -3,6 +3,7 @@ import {View, FlatList, PixelRatio, Keyboard} from 'react-native';
 import PropTypes from 'prop-types';
 import {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
+import Str from 'expensify-common/lib/str';
 import {Parser as HtmlParser} from 'htmlparser2';
 import * as Expensicons from '../Icon/Expensicons';
 import styles from '../../styles/styles';
@@ -21,6 +22,7 @@ import withLocalize, {withLocalizePropTypes} from '../withLocalize';
 import compose from '../../libs/compose';
 import withWindowDimensions from '../withWindowDimensions';
 import reportPropTypes from '../../pages/reportPropTypes';
+import addEncryptedAuthTokenToURL from '../../libs/addEncryptedAuthTokenToURL';
 
 const propTypes = {
     /** source is used to determine the starting index in the array of attachments */
@@ -157,6 +159,15 @@ class AttachmentCarousel extends React.Component {
 
         const htmlParser = new HtmlParser({
             onopentag: (name, attribs) => {
+                const isVideo = Boolean(Str.isVideo(attribs['data-expensify-source'] || ''));
+                if (isVideo) {
+                    attachments.unshift({
+                        source: addEncryptedAuthTokenToURL(tryResolveUrlFromApiRoot(attribs['data-expensify-source'])),
+                        isAuthTokenRequired: true,
+                        file: {name},
+                    });
+                    return;
+                }
                 if (name !== 'img' || !attribs.src) {
                     return;
                 }
