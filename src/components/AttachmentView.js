@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useRef, useState} from 'react';
 import {View, ActivityIndicator} from 'react-native';
 import _ from 'underscore';
 import PropTypes from 'prop-types';
@@ -77,6 +77,7 @@ const defaultProps = {
 function AttachmentView(props) {
     const [loadComplete, setLoadComplete] = useState(false);
     const containerStyles = [styles.flex1, styles.flexRow, styles.alignSelfStretch];
+    const ref = useRef(null);
 
     // Handles case where source is a component (ex: SVG)
     if (_.isFunction(props.source)) {
@@ -138,6 +139,7 @@ function AttachmentView(props) {
     if (isVideo || (props.file && Str.isVideo(props.file.name))) {
         const children = (
             <VideoPlayer
+                ref={ref}
                 url={props.source}
                 videoPlayerStyles={props.videoPlayerStyles}
                 shouldPlay={props.isFocused}

@@ -7,6 +7,7 @@ import Icon from '../Icon';
 import styles from '../../styles/styles';
 import * as Expensicons from '../Icon/Expensicons';
 import VideoPlayerThumbnail from './VideoPlayerThumbnail';
+import {PlaybackContext} from '../withPlayback';
 
 const propTypes = {
     url: PropTypes.string.isRequired,
@@ -17,19 +18,19 @@ const propTypes = {
 const defaultProps = {};
 
 function VideoPlayerPreview(props) {
-    const [isThumbnail, setIsThumbnail] = useState(true);
+    const {currentlyPlayingURL, updateCurrentlyPlayingURL} = React.useContext(PlaybackContext);
     const [aspectRatio, setAspectRatio] = useState(1.5);
     const videoRef = useRef(null);
 
     const handleOnPress = () => {
-        setIsThumbnail(false);
+        updateCurrentlyPlayingURL(props.url);
     };
 
     const onVideoLoaded = (e) => {
         setAspectRatio(e.srcElement.videoWidth / e.srcElement.videoHeight);
     };
 
-    return isThumbnail ? (
+    return currentlyPlayingURL !== props.url ? (
         <VideoPlayerThumbnail
             onPress={handleOnPress}
             accessibilityLabel={props.fileName}
@@ -40,7 +41,7 @@ function VideoPlayerPreview(props) {
                 ref={videoRef}
                 url={props.url}
                 videoPlayerStyles={{borderRadius: 10}}
-                shouldPlay={false}
+                shouldPlay={currentlyPlayingURL === props.url}
                 onVideoLoaded={onVideoLoaded}
             />
             <PressableWithoutFeedback
