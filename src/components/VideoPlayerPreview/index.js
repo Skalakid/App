@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {View} from 'react-native';
 import PropTypes from 'prop-types';
-import AttachmentView from '../AttachmentView';
+import VideoPlayer from '../VideoPlayer';
 import PressableWithoutFeedback from '../Pressable/PressableWithoutFeedback';
 import Icon from '../Icon';
 import styles from '../../styles/styles';
@@ -18,8 +18,15 @@ const defaultProps = {};
 
 function VideoPlayerPreview(props) {
     const [isThumbnail, setIsThumbnail] = useState(true);
+    const [aspectRatio, setAspectRatio] = useState(1.5);
+    const videoRef = useRef(null);
+
     const handleOnPress = () => {
         setIsThumbnail(false);
+    };
+
+    const onVideoLoaded = (e) => {
+        setAspectRatio(e.srcElement.videoWidth / e.srcElement.videoHeight);
     };
 
     return isThumbnail ? (
@@ -28,11 +35,13 @@ function VideoPlayerPreview(props) {
             accessibilityLabel={props.fileName}
         />
     ) : (
-        <View style={{height: 250, width: 400, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
-            <AttachmentView
-                source={props.url}
-                file={{name: props.fileName}}
+        <View style={{width: 350, aspectRatio, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
+            <VideoPlayer
+                ref={videoRef}
+                url={props.url}
                 videoPlayerStyles={{borderRadius: 10}}
+                shouldPlay={false}
+                onVideoLoaded={onVideoLoaded}
             />
             <PressableWithoutFeedback
                 accessibilityLabel={props.fileName}

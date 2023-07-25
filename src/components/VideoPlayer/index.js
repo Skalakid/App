@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Video, ResizeMode} from 'expo-av';
 import styles from '../../styles/styles';
@@ -8,19 +8,19 @@ const propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     // videoPlayerStyles: PropTypes.object,
     shouldPlay: PropTypes.bool,
+    onVideoLoaded: PropTypes.func,
 };
 
 const defaultProps = {
     shouldPlay: false,
+    onVideoLoaded: () => {},
 };
 
-function VideoPlayer(props) {
+const VideoPlayer = forwardRef((props, ref) => {
     const [isLoaded, setIsLoaded] = useState(false);
-    const ref = useRef();
 
     useEffect(() => {
-        if (!ref.current.setStatusAsync) return;
-
+        if (ref === null || !ref.current.setStatusAsync) return;
         if (isLoaded && props.shouldPlay) ref.current.setStatusAsync({shouldPlay: true});
         else ref.current.setStatusAsync({shouldPlay: false});
     }, [props.shouldPlay, isLoaded]);
@@ -37,10 +37,13 @@ function VideoPlayer(props) {
             resizeMode={ResizeMode.CONTAIN}
             isLooping={false}
             shouldPlay
-            onReadyForDisplay={() => setIsLoaded(true)}
+            onReadyForDisplay={(e) => {
+                setIsLoaded(true);
+                props.onVideoLoaded(e);
+            }}
         />
     );
-}
+});
 
 VideoPlayer.propTypes = propTypes;
 VideoPlayer.defaultProps = defaultProps;
