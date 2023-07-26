@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {View} from 'react-native';
 import PropTypes from 'prop-types';
 import VideoPlayer from '../VideoPlayer';
@@ -23,9 +23,10 @@ let sharedComponent = {
 };
 
 function VideoPlayerPreview(props) {
-    const {currentlyPlayingURL, updateCurrentlyPlayingURL} = React.useContext(PlaybackContext);
+    const {currentlyPlayingURL, updateCurrentlyPlayingURL, updateSharedElements} = React.useContext(PlaybackContext);
     const [aspectRatio, setAspectRatio] = useState(1.5);
     const videoRef = useRef(null);
+    const shouldPlay = currentlyPlayingURL === props.url;
 
     const handleOnPress = () => {
         updateCurrentlyPlayingURL(props.url);
@@ -34,6 +35,11 @@ function VideoPlayerPreview(props) {
     const onVideoLoaded = (e) => {
         setAspectRatio(e.srcElement.videoWidth / e.srcElement.videoHeight);
     };
+
+    useEffect(() => {
+        if (shouldPlay) updateSharedElements(sharedComponent.originalParent.current, sharedComponent.sharedElement.current);
+        return () => {};
+    }, [shouldPlay]);
 
     return currentlyPlayingURL !== props.url ? (
         <VideoPlayerThumbnail
@@ -54,14 +60,14 @@ function VideoPlayerPreview(props) {
                     ref={videoRef}
                     url={props.url}
                     videoPlayerStyles={{borderRadius: 10}}
-                    shouldPlay={currentlyPlayingURL === props.url}
+                    shouldPlay={shouldPlay}
                     onVideoLoaded={onVideoLoaded}
                 />
             </View>
             <PressableWithoutFeedback
                 accessibilityLabel={props.fileName}
                 accessibilityRole="button"
-                onPress={() => props.showModal(sharedComponent)}
+                onPress={props.showModal}
                 style={{position: 'absolute', top: 10, right: 10}}
             >
                 <Icon src={Expensicons.Expand} />

@@ -1,4 +1,4 @@
-import React, {createContext, useState, forwardRef, useContext, useCallback, useMemo} from 'react';
+import React, {createContext, useState, forwardRef, useContext, useCallback, useMemo, useRef} from 'react';
 import PropTypes from 'prop-types';
 import getComponentDisplayName from '../libs/getComponentDisplayName';
 
@@ -10,7 +10,10 @@ const playbackPropTypes = {
 };
 
 function PlaybackContextProvider({children}) {
-    const [currentlyPlayingURL, setCurrentlyPlayingURL] = useState(1);
+    const [currentlyPlayingURL, setCurrentlyPlayingURL] = useState(null);
+
+    const originalParent = useRef(null);
+    const sharedElement = useRef(null);
 
     const updateCurrentlyPlayingURL = useCallback(
         (url) => {
@@ -19,10 +22,18 @@ function PlaybackContextProvider({children}) {
         [setCurrentlyPlayingURL],
     );
 
+    const updateSharedElements = (parent, child) => {
+        originalParent.current = parent;
+        sharedElement.current = child;
+    };
+
     const contextValue = useMemo(
         () => ({
             updateCurrentlyPlayingURL,
             currentlyPlayingURL,
+            updateSharedElements,
+            originalParent,
+            sharedElement,
         }),
         [updateCurrentlyPlayingURL, currentlyPlayingURL],
     );

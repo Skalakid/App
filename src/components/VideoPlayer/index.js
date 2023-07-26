@@ -2,6 +2,7 @@ import React, {forwardRef, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Video, ResizeMode} from 'expo-av';
 import styles from '../../styles/styles';
+import {PlaybackContext} from '../withPlayback';
 
 const propTypes = {
     url: PropTypes.string.isRequired,
@@ -17,12 +18,16 @@ const defaultProps = {
 };
 
 const VideoPlayer = forwardRef((props, ref) => {
+    const {updateCurrentlyPlayingURL} = React.useContext(PlaybackContext);
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         if (ref === null || !ref.current.setStatusAsync) return;
-        if (isLoaded && props.shouldPlay) {
-            ref.current.setStatusAsync({shouldPlay: true});
+        if (props.shouldPlay) {
+            updateCurrentlyPlayingURL(props.url);
+            if (isLoaded) {
+                ref.current.setStatusAsync({shouldPlay: true});
+            }
         } else ref.current.setStatusAsync({shouldPlay: false});
     }, [props.shouldPlay, isLoaded]);
 

@@ -16,6 +16,7 @@ import Tooltip from '../Tooltip';
 import useLocalize from '../../hooks/useLocalize';
 import createInitialState from './createInitialState';
 import {propTypes, defaultProps} from './attachmentCarouselPropTypes';
+import {PlaybackContext} from '../withPlayback';
 
 const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
 const viewabilityConfig = {
@@ -25,6 +26,7 @@ const viewabilityConfig = {
 };
 
 function AttachmentCarousel(props) {
+    const {originalParent, sharedElement} = React.useContext(PlaybackContext);
     const {onNavigate} = props;
 
     const {translate} = useLocalize();
@@ -51,12 +53,13 @@ function AttachmentCarousel(props) {
     }
 
     useEffect(() => {
-        if (ref.current !== null && ref.current.firstChild === null && props.sharedComponentObject) {
-            ref.current.appendChild(props.sharedComponentObject.sharedElement.current);
+        const parent = originalParent.current;
+        const child = sharedElement.current;
+        if (ref.current !== null && ref.current.firstChild === null && sharedElement.current) {
+            ref.current.appendChild(child);
         }
         return () => {
-            // eslint-disable-next-line react/prop-types
-            if (props.sharedComponentObject) props.sharedComponentObject.originalParent.current.appendChild(props.sharedComponentObject.sharedElement.current);
+            if (parent) parent.appendChild(child);
             return null;
         };
     }, [ref.current]);
@@ -222,8 +225,8 @@ function AttachmentCarousel(props) {
      */
     const renderItem = useCallback(
         ({item}) => {
-            if (props.sharedComponentObject) {
-                const sharedURL = props.sharedComponentObject.sharedElement.current.innerHTML.split('"')[1];
+            if (sharedElement.current) {
+                const sharedURL = sharedElement.current.innerHTML.split('"')[1];
                 if (sharedURL === item.source) {
                     return (
                         <View

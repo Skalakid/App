@@ -86,7 +86,6 @@ const defaultProps = {
     onModalHide: () => {},
     onCarouselAttachmentChange: () => {},
 };
-let sharedComponentObject = null;
 
 function AttachmentModal(props) {
     const [isModalOpen, setIsModalOpen] = useState(props.defaultOpen);
@@ -285,8 +284,7 @@ function AttachmentModal(props) {
     /**
      *  open the modal
      */
-    const openModal = useCallback((sharedComponent) => {
-        sharedComponentObject = sharedComponent;
+    const openModal = useCallback(() => {
         setIsModalOpen(true);
     }, []);
 
@@ -327,7 +325,6 @@ function AttachmentModal(props) {
                             onNavigate={onNavigate}
                             source={props.source}
                             onToggleKeyboard={updateConfirmButtonVisibility}
-                            sharedComponentObject={sharedComponentObject}
                         />
                     ) : (
                         Boolean(sourceForAttachmentView) &&

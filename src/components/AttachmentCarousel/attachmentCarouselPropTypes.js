@@ -14,15 +14,12 @@ const propTypes = {
 
     /** The report currently being looked at */
     report: reportPropTypes.isRequired,
-
-    sharedComponentObject: PropTypes.any,
 };
 
 const defaultProps = {
     source: '',
     reportActions: {},
     onNavigate: () => {},
-    sharedComponentObject: null,
 };
 
 export {propTypes, defaultProps};
