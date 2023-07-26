@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {View, Animated, Keyboard} from 'react-native';
 import Str from 'expensify-common/lib/str';
@@ -86,6 +86,7 @@ const defaultProps = {
     onModalHide: () => {},
     onCarouselAttachmentChange: () => {},
 };
+let sharedComponentObject = null;
 
 function AttachmentModal(props) {
     const [isModalOpen, setIsModalOpen] = useState(props.defaultOpen);
@@ -284,7 +285,8 @@ function AttachmentModal(props) {
     /**
      *  open the modal
      */
-    const openModal = useCallback(() => {
+    const openModal = useCallback((sharedComponent) => {
+        sharedComponentObject = sharedComponent;
         setIsModalOpen(true);
     }, []);
 
@@ -325,6 +327,7 @@ function AttachmentModal(props) {
                             onNavigate={onNavigate}
                             source={props.source}
                             onToggleKeyboard={updateConfirmButtonVisibility}
+                            sharedComponentObject={sharedComponentObject}
                         />
                     ) : (
                         Boolean(sourceForAttachmentView) &&

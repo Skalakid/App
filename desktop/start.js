@@ -3,7 +3,7 @@ const portfinder = require('portfinder');
 const concurrently = require('concurrently');
 require('dotenv').config();
 
-const basePort = 8082;
+const basePort = 8080;
 
 portfinder
     .getPortPromise({

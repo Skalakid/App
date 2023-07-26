@@ -17,6 +17,11 @@ const propTypes = {
 
 const defaultProps = {};
 
+let sharedComponent = {
+    sharedElement: {current: null},
+    originalParent: {current: null},
+};
+
 function VideoPlayerPreview(props) {
     const {currentlyPlayingURL, updateCurrentlyPlayingURL} = React.useContext(PlaybackContext);
     const [aspectRatio, setAspectRatio] = useState(1.5);
@@ -37,17 +42,26 @@ function VideoPlayerPreview(props) {
         />
     ) : (
         <View style={{width: 350, aspectRatio, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
-            <VideoPlayer
-                ref={videoRef}
-                url={props.url}
-                videoPlayerStyles={{borderRadius: 10}}
-                shouldPlay={currentlyPlayingURL === props.url}
-                onVideoLoaded={onVideoLoaded}
-            />
+            <View
+                ref={(el) => {
+                    if (!el) return;
+                    sharedComponent.originalParent.current = el;
+                    if (el.childNodes[0]) sharedComponent.sharedElement.current = el.childNodes[0];
+                }}
+                style={{flex: 1}}
+            >
+                <VideoPlayer
+                    ref={videoRef}
+                    url={props.url}
+                    videoPlayerStyles={{borderRadius: 10}}
+                    shouldPlay={currentlyPlayingURL === props.url}
+                    onVideoLoaded={onVideoLoaded}
+                />
+            </View>
             <PressableWithoutFeedback
                 accessibilityLabel={props.fileName}
                 accessibilityRole="button"
-                onPress={props.showModal}
+                onPress={() => props.showModal(sharedComponent)}
                 style={{position: 'absolute', top: 10, right: 10}}
             >
                 <Icon src={Expensicons.Expand} />

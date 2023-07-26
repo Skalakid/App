@@ -69,10 +69,27 @@ class AttachmentCarousel extends React.Component {
         this.toggleArrowsVisibility = this.toggleArrowsVisibility.bind(this);
 
         this.state = this.createInitialState();
+        this.ref = React.createRef();
     }
 
     componentDidMount() {
         this.autoHideArrow();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.ref !== prevProps.ref) {
+            if (this.ref.current !== null) {
+                this.ref.current.appendChild(this.props.sharedComponentObject.sharedElement.current);
+            }
+        }
+        return null;
+    }
+
+    componentWillUnmount() {
+        if (this.props.sharedComponentObject) {
+            this.props.sharedComponentObject.originalParent.current.appendChild(this.props.sharedComponentObject.sharedElement.current);
+        }
+        return null;
     }
 
     /**
@@ -290,6 +307,18 @@ class AttachmentCarousel extends React.Component {
      * @returns {JSX.Element}
      */
     renderItem({item}) {
+        if (this.props.sharedComponentObject) {
+            const sharedURL = this.props.sharedComponentObject.sharedElement.current.innerHTML.split('"')[1];
+            if (sharedURL === item.source) {
+                return (
+                    <View
+                        ref={this.ref}
+                        style={{flex: 1}}
+                    />
+                );
+            }
+        }
+
         return (
             <AttachmentView
                 isFocused={this.state.activeSource === item.source}
