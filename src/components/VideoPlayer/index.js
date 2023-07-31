@@ -18,7 +18,7 @@ const defaultProps = {
 };
 
 const VideoPlayer = forwardRef((props, ref) => {
-    const {updateCurrentlyPlayingURL} = React.useContext(PlaybackContext);
+    const {updateCurrentlyPlayingURL, updateIsFullScreen} = React.useContext(PlaybackContext);
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
@@ -45,6 +45,9 @@ const VideoPlayer = forwardRef((props, ref) => {
             onReadyForDisplay={(e) => {
                 setIsLoaded(true);
                 props.onVideoLoaded(e);
+            }}
+            onFullscreenUpdate={(e) => {
+                updateIsFullScreen(e.fullscreenUpdate === 1);
             }}
         />
     );

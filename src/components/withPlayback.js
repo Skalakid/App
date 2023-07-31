@@ -11,9 +11,14 @@ const playbackPropTypes = {
 
 function PlaybackContextProvider({children}) {
     const [currentlyPlayingURL, setCurrentlyPlayingURL] = useState(null);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     const originalParent = useRef(null);
     const sharedElement = useRef(null);
+
+    const updateIsFullScreen = useCallback((isSet) => {
+        setIsFullScreen(isSet);
+    }, []);
 
     const updateCurrentlyPlayingURL = useCallback(
         (url) => {
@@ -34,8 +39,10 @@ function PlaybackContextProvider({children}) {
             updateSharedElements,
             originalParent,
             sharedElement,
+            updateIsFullScreen,
+            isFullScreen,
         }),
-        [updateCurrentlyPlayingURL, currentlyPlayingURL],
+        [updateCurrentlyPlayingURL, currentlyPlayingURL, updateIsFullScreen, isFullScreen],
     );
 
     return <PlaybackContext.Provider value={contextValue}>{children}</PlaybackContext.Provider>;
