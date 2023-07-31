@@ -41,16 +41,30 @@ function AttachmentCarousel(props) {
     const [containerWidth, setContainerWidth] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const [activeSource, setActiveSource] = useState(null);
+    const ref = useRef(null);
 
     let isForwardDisabled = page === 0;
     let isBackDisabled = page === _.size(attachments) - 1;
-
-    const ref = useRef(null);
 
     if (canUseTouchScreen) {
         isForwardDisabled = isBackDisabled;
         isBackDisabled = page === 0;
     }
+
+    useEffect(() => {
+        const initialState = createInitialState(props);
+        setPage(initialState.page);
+        setAttachments(initialState.attachments);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.reportActions]);
+
+    useEffect(() => {
+        if (!scrollRef || !scrollRef.current) {
+            return;
+        }
+        scrollRef.current.scrollToIndex({index: page, animated: false});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [attachments]);
 
     useEffect(() => {
         const parent = originalParent.current;
@@ -63,13 +77,6 @@ function AttachmentCarousel(props) {
             return null;
         };
     }, [ref.current]);
-
-    useEffect(() => {
-        const initialState = createInitialState(props);
-        setPage(initialState.page);
-        setAttachments(initialState.attachments);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     /**
      * Calculate items layout information to optimize scrolling performance
@@ -236,7 +243,6 @@ function AttachmentCarousel(props) {
                     );
                 }
             }
-
             return (
                 <AttachmentView
                     isFocused={activeSource === item.source}
