@@ -26,7 +26,7 @@ const viewabilityConfig = {
 };
 
 function AttachmentCarousel(props) {
-    const {originalParent, sharedElement, isFullScreen} = React.useContext(PlaybackContext);
+    const {originalParent, sharedElement} = React.useContext(PlaybackContext);
     const {onNavigate} = props;
 
     const {translate} = useLocalize();
@@ -41,8 +41,6 @@ function AttachmentCarousel(props) {
     const [containerWidth, setContainerWidth] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const [activeSource, setActiveSource] = useState(null);
-
-    const [screenWidth, setScreenWidth] = useState(0);
     const ref = useRef(null);
 
     let isForwardDisabled = page === 0;
@@ -79,11 +77,6 @@ function AttachmentCarousel(props) {
             return null;
         };
     }, [ref.current]);
-
-    useEffect(() => {
-        if (isFullScreen) return;
-        setScreenWidth(windowWidth);
-    }, [windowWidth]);
 
     /**
      * Calculate items layout information to optimize scrolling performance
@@ -219,7 +212,7 @@ function AttachmentCarousel(props) {
             // Use window width instead of layout width to address the issue in https://github.com/Expensify/App/issues/17760
             // considering horizontal margin and border width in centered modal
             const modalStyles = styles.centeredModalStyles(isSmallScreenWidth, true);
-            const style = [cellRendererProps.style, styles.h100, {width: PixelRatio.roundToNearestPixel(screenWidth - (modalStyles.marginHorizontal + modalStyles.borderWidth) * 2)}];
+            const style = [cellRendererProps.style, styles.h100, {width: PixelRatio.roundToNearestPixel(windowWidth - (modalStyles.marginHorizontal + modalStyles.borderWidth) * 2)}];
 
             return (
                 <View
@@ -229,7 +222,7 @@ function AttachmentCarousel(props) {
                 />
             );
         },
-        [isSmallScreenWidth, screenWidth],
+        [isSmallScreenWidth, windowWidth],
     );
 
     /**
@@ -239,15 +232,17 @@ function AttachmentCarousel(props) {
      */
     const renderItem = useCallback(
         ({item}) => {
-            if (sharedElement.current && activeSource === item.source) {
-                return (
-                    <View
-                        ref={ref}
-                        style={{flex: 1}}
-                    />
-                );
+            if (sharedElement.current) {
+                const sharedURL = sharedElement.current.innerHTML.split('"')[1];
+                if (sharedURL === item.source) {
+                    return (
+                        <View
+                            ref={ref}
+                            style={{flex: 1}}
+                        />
+                    );
+                }
             }
-
             return (
                 <AttachmentView
                     isFocused={activeSource === item.source}
@@ -259,7 +254,7 @@ function AttachmentCarousel(props) {
                 />
             );
         },
-        [activeSource, toggleArrowsVisibility, updateZoomState],
+        [activeSource, sharedElement, toggleArrowsVisibility, updateZoomState],
     );
 
     return (

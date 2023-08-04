@@ -24,7 +24,10 @@ let sharedComponent = {
 
 function VideoPlayerPreview(props) {
     const {currentlyPlayingURL, updateCurrentlyPlayingURL, updateSharedElements} = React.useContext(PlaybackContext);
-    const [aspectRatio, setAspectRatio] = useState(1.5);
+
+    const [isThumbnail, setIsThumbnail] = useState(true);
+    const [videoStyles, setVideoStyles] = useState({width: 350, aspectRatio: 1.5});
+
     const videoRef = useRef(null);
     const shouldPlay = currentlyPlayingURL === props.url;
 
@@ -33,21 +36,27 @@ function VideoPlayerPreview(props) {
     };
 
     const onVideoLoaded = (e) => {
-        setAspectRatio(e.srcElement.videoWidth / e.srcElement.videoHeight);
+        const {videoWidth, videoHeight} = e.srcElement;
+        const aspectRatio = videoWidth / videoHeight;
+        if (videoWidth > videoHeight) setVideoStyles({width: 350, aspectRatio});
+        else setVideoStyles({height: 350, aspectRatio});
     };
 
     useEffect(() => {
-        if (shouldPlay) updateSharedElements(sharedComponent.originalParent.current, sharedComponent.sharedElement.current);
+        if (shouldPlay) {
+            setIsThumbnail(false);
+            updateSharedElements(sharedComponent.originalParent.current, sharedComponent.sharedElement.current);
+        }
         return () => {};
     }, [shouldPlay]);
 
-    return currentlyPlayingURL !== props.url ? (
+    return isThumbnail ? (
         <VideoPlayerThumbnail
             onPress={handleOnPress}
             accessibilityLabel={props.fileName}
         />
     ) : (
-        <View style={{width: 350, aspectRatio, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
+        <View style={{...videoStyles, overflow: 'hidden', ...styles.webViewStyles.tagStyles.img}}>
             <View
                 ref={(el) => {
                     if (!el) return;
